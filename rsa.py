@@ -33,7 +33,6 @@ def encrypt(message, public_key):
 
 
 def decrypt(ciphertext, private_key):
-    """Decrypt a ciphertext using an RSA private key."""
     n, d = private_key
     plaintext = [chr(pow(ord(char), d, n)) for char in ciphertext]
     return ''.join(plaintext)
