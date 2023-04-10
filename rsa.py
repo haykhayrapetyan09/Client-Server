@@ -36,8 +36,3 @@ def decrypt(ciphertext, private_key):
     n, d = private_key
     plaintext = [chr(pow(ord(char), d, n)) for char in ciphertext]
     return ''.join(plaintext)
-
-
-# Example usage
-
-#
