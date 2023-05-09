@@ -1,19 +1,35 @@
 import socket
 import sys
+
+from PyQt5 import QtGui
+
 import rsa
+import rle
+import threading
 from ast import literal_eval as make_tuple
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget, QTextEdit, QPushButton, QLineEdit
 
 HEADER = 64
 PORT = 5050
-FORMAT = 'utf-8'
 HOST = "localhost"
 ADDR = (HOST, PORT)
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = "DISCONNECT"
+
 
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
-public_key = client.recv(2048).decode(FORMAT)
-public_key = make_tuple(public_key)
+connected = True
+
+public_key_length = client.recv(HEADER).decode(FORMAT)
+if public_key_length:
+    public_key = client.recv(int(public_key_length)).decode(FORMAT)
+    public_key = make_tuple(public_key)
+
+first_msg_length = client.recv(HEADER).decode(FORMAT)
+if first_msg_length:
+    first_message = client.recv(int(first_msg_length)).decode(FORMAT)
 
 
 class MainWindow(QMainWindow):
@@ -28,7 +44,9 @@ class MainWindow(QMainWindow):
 
         self.message_box = QTextEdit()
         self.message_box.setReadOnly(True)
+        self.message_box.setAlignment(Qt.AlignLeft)
         grid_layout.addWidget(self.message_box, 0, 0, 1, 2)
+        self.message_box.append(first_message)
 
         self.input_box = QLineEdit()
         grid_layout.addWidget(self.input_box, 1, 0)
@@ -38,20 +56,46 @@ class MainWindow(QMainWindow):
         grid_layout.addWidget(self.send_button, 1, 1)
 
     def send_message(self):
+        global connected
         message = self.input_box.text()
         self.input_box.setText('')
+        if message == DISCONNECT_MESSAGE:
+            connected = False
         ciphertext = rsa.encrypt(message, public_key)
-        self.message_box.append(message + " / " + ciphertext)
+        ciphertext = rle.encode(ciphertext)
+
+        cursor = self.message_box.textCursor()
+        cursor.setPosition(0)
+        cursor.movePosition(QtGui.QTextCursor.End, QtGui.QTextCursor.KeepAnchor)
+        cursor.setAlignment(Qt.AlignRight)
+        self.message_box.append("You: " + message)
+
         message = ciphertext.encode(FORMAT)
-        msg_length = len(message)
-        send_length = str(msg_length).encode(FORMAT)
+        send_length = str(len(message)).encode(FORMAT)
         send_length += b' ' * (HEADER - len(send_length))
         client.send(send_length)
         client.send(message)
+
+    def receive_message(self):
+        while connected:
+            msg_length = client.recv(HEADER).decode(FORMAT)
+            if msg_length:
+                msg_length = int(msg_length)
+                msg = client.recv(msg_length).decode(FORMAT)
+                msg = rle.decode(msg)
+                plaintext = rsa.decrypt(msg, public_key)
+
+                cursor = self.edit.textCursor()
+                cursor.setPosition(start)
+                cursor.setPosition(end, QtGui.QTextCursor.KeepAnchor)
+                self.message_box.setTextCursor(cursor)
+                self.message_box.append(plaintext)
 
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
+    thread = threading.Thread(target=window.receive_message)
+    thread.start()
     sys.exit(app.exec_())
