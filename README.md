@@ -33,4 +33,4 @@ python client.py
 All the messages are encrypted via RSA algorithm before sending. Then they are encoded with Run Length Encoding algorithm to compress message.
 When server gets the encrypted message, it at first decodes, then decrypts via private key to print the sent message. Then it once more encrypts it, encodes and sends to all connected clients.
 
-There is disconnect message "DISCONNECT". When sending it, the client will be disconnected from the server, and will be removed from the connected clients' list
+There is disconnect message "DISCONNECT". When sending it, the client will be disconnected from the server, and will be removed from the connected clients' list.
