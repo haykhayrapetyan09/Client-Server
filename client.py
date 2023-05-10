@@ -1,7 +1,6 @@
 import socket
 import sys
-import rsa
-import rle
+from algorithms import rsa, rle
 import threading
 from ast import literal_eval as make_tuple
 from PyQt5.QtWidgets import QApplication, QMainWindow, QGridLayout, QWidget, QTextEdit, QPushButton, QLineEdit

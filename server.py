@@ -2,8 +2,7 @@ import socket
 import threading
 from copy import copy
 
-import rsa
-import rle
+from algorithms import rsa, rle
 
 HEADER = 64
 PORT = 5050
