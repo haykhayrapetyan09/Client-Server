@@ -49,9 +49,7 @@ def handle_client():
         if msg_length:
             msg_length = int(msg_length)
             msg = conn.recv(msg_length).decode(FORMAT)
-            print("ENC", msg)
             msg = rle.decode(msg)
-            print("ENC", msg)
             plaintext = rsa.decrypt(msg, private_key)
             print(msg, '/', plaintext)
 
@@ -70,7 +68,6 @@ def handle_client():
 def send_message(message, sender_details):
     ciphertext = rsa.encrypt(message, private_key)
     ciphertext = rle.encode(ciphertext)
-    print("MESSAGE", ciphertext)
     message = ciphertext.encode(FORMAT)
 
     other_clients = copy(client_list)
