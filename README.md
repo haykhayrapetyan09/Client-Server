@@ -3,7 +3,7 @@
 This project represents simple Client-Server chat application. 
 Clients are basic window applications, that can send messages and display received messagess from other clients.
 
-![alt text](https://github.com/haykhayrapetyan09/Client-Server/blob/e0fbe3e417496ac1e8e0b5a796f89df80b96f083/.media/img.png)
+![alt text](.media/img.png)
 
 The communication between clients and the server is done via python sockets. 
 
