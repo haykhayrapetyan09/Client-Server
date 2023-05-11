@@ -14,7 +14,7 @@ There can be as many client as you want, messaging is done similar to group chat
 ```
 cd Client-Server
 python -m venv .venv
-source .venv/bin.activate
+source .venv/bin/activate
 pip install requirements.txt
 ```
 2. Run server
